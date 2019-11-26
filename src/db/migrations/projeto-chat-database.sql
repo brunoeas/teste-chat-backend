@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS mensagem (
   id_mensagem serial PRIMARY KEY,
   ds_text TEXT NOT NULL,
   dh_enviado TIMESTAMP WITH TIME ZONE NOT NULL,
-  id_usuario INTEGER REFERENCES usuario (id_usuario)
+  id_usuario INTEGER,
+  CONSTRAINT fk_mensagem_usuario FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario)
 );

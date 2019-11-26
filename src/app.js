@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const socketio = require('socket.io');
 const http = require('http');
-const connectAndMigrateDatabase = require('./db/index');
+const migrateDatabase = require('./db/index');
+const initServices = require('./service/index');
 
-connectAndMigrateDatabase();
+migrateDatabase();
 
 const app = express();
 app.use(morgan('dev'));
@@ -15,12 +16,9 @@ app.use(bodyParser.json());
 const server = http.createServer(app);
 const io = socketio(server);
 
-io.on('connection', socket => {
-  console.log('alguém conectou');
-  socket.on('teste', res => console.log(res));
-  setTimeout(() => socket.emit('teste', 'eduardo'), 5000);
-});
+const port = process.env.PORT || 2210;
+server.listen(port, () => console.log('> Servidor on-line na porta:', port));
 
-server.listen(2210, () => console.log('> Servidor on-line na porta 2210'));
+initServices(io);
 
-module.exports = app;
+module.exports = { io, server, app };

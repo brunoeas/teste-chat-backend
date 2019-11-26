@@ -4,7 +4,14 @@
  * @class Usuario
  */
 class Usuario {
-  constructor(idUsuario, nmUsuario) {
+  /**
+   * Cria uma instância de Usuário
+   *
+   * @param {Number} [idUsuario=undefined] - ID do Usuário
+   * @param {String} [nmUsuario=undefined] - Nome do Usuário
+   * @memberof Usuario
+   */
+  constructor(idUsuario = undefined, nmUsuario = undefined) {
     this.idUsuario = idUsuario;
     this.nmUsuario = nmUsuario;
   }
