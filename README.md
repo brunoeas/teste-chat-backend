@@ -18,7 +18,11 @@ File: `config-db.json`
 # Run
 
 1 - Clone ou baixe o projeto
-2 - Crie um banco de dados e coloque as informações deste em `config-db.json` (como expecificado acima)
-3 - `cd teste-chat-backend`
+
+2 - `cd teste-chat-backend`
+
+3 - Crie um banco de dados e coloque as informações deste em `config-db.json` (como expecificado acima)
+
 4 - `npm install`
+
 5 - `npm start`
