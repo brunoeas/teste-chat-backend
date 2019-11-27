@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const socketio = require('socket.io');
 const http = require('http');
-const migrateDatabase = require('./db/index');
+const migrateDatabase = require('./db/migration');
 const initServices = require('./service/index');
 
 migrateDatabase();
@@ -21,4 +21,4 @@ server.listen(port, () => console.log('> Servidor on-line na porta:', port));
 
 initServices(io);
 
-module.exports = { io, server, app };
+module.exports = app;

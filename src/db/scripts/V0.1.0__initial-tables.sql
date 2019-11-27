@@ -1,4 +1,4 @@
--- CREATING TABLES
+-- Criando tabelas se não existem
 
 CREATE TABLE IF NOT EXISTS usuario (
   id_usuario serial PRIMARY KEY,

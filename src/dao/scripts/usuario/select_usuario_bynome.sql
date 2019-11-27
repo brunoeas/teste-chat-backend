@@ -1,0 +1,1 @@
+SELECT * FROM usuario as u WHERE LOWER(unaccent(u.nm_usuario)) = LOWER(unaccent($1));
