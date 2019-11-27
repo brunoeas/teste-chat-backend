@@ -1,0 +1,1 @@
+INSERT INTO usuario (nm_usuario) VALUES ($1) RETURNING *;
