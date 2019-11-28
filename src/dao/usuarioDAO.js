@@ -10,13 +10,19 @@ const Usuario = require('../model/usuario');
  * @returns {Promise<Usuario[]>} Promise com um array com todos os Usuários
  */
 async function selectAllUsuarios() {
-  const pool = new Pool(config);
+  return new Promise((resolve, reject) => {
+    const pool = new Pool(config);
 
-  const query = readScript('usuario/select_all_usuarios.sql');
+    const query = readScript('usuario/select_all_usuarios.sql');
 
-  return await pool.query(query).then(res => {
-    pool.end();
-    return res.rows.map(data => convertDataToModel(data, new Usuario()));
+    pool
+      .query(query)
+      .then(res => {
+        pool.end();
+        return res.rows.map(data => convertDataToModel(data, new Usuario()));
+      })
+      .then(resolve)
+      .catch(reject);
   });
 }
 
@@ -28,14 +34,20 @@ async function selectAllUsuarios() {
  * @returns {Promise<Usuario>} Promise com o Usuário
  */
 async function selectUsuarioById(id) {
-  const pool = new Pool(config);
+  return new Promise((resolve, reject) => {
+    const pool = new Pool(config);
 
-  const query = readScript('usuario/select_usuario_byid.sql');
-  const values = [id];
+    const query = readScript('usuario/select_usuario_byid.sql');
+    const values = [id];
 
-  return await pool.query(query, values).then(res => {
-    pool.end();
-    return res.rows.map(data => convertDataToModel(data, new Usuario()))[0];
+    pool
+      .query(query, values)
+      .then(res => {
+        pool.end();
+        return res.rows.map(data => convertDataToModel(data, new Usuario()))[0];
+      })
+      .then(resolve)
+      .catch(reject);
   });
 }
 
@@ -47,14 +59,20 @@ async function selectUsuarioById(id) {
  * @returns {Promise<Usuario[]>} Promise com a lista de Usuários
  */
 async function selectUsuarioByNome(nome) {
-  const pool = new Pool(config);
+  return new Promise((resolve, reject) => {
+    const pool = new Pool(config);
 
-  const query = readScript('usuario/select_usuario_bynome.sql');
-  const values = [nome];
+    const query = readScript('usuario/select_usuario_bynome.sql');
+    const values = [nome];
 
-  return await pool.query(query, values).then(res => {
-    pool.end();
-    return res.rows.map(data => convertDataToModel(data, new Usuario()));
+    pool
+      .query(query, values)
+      .then(res => {
+        pool.end();
+        return res.rows.map(data => convertDataToModel(data, new Usuario()));
+      })
+      .then(resolve)
+      .catch(reject);
   });
 }
 
@@ -67,17 +85,23 @@ async function selectUsuarioByNome(nome) {
  * @throws NOME_DUPLICADO - caso o nome do usuário ja esteja cadastrado;
  */
 async function insertUsuario(usuario) {
-  const isDuplicado = isUsuarioNomeDuplicado(usuario.nmUsuario);
-  if (isDuplicado) throw 'NOME_DUPLICADO';
+  return new Promise(async (resolve, reject) => {
+    const isDuplicado = await isUsuarioNomeDuplicado(usuario.nmUsuario);
+    if (isDuplicado) reject('NOME_DUPLICADO');
 
-  const pool = new Pool(config);
+    const pool = new Pool(config);
 
-  const query = readScript('usuario/insert_usuario.sql');
-  const values = [usuario.nmUsuario];
+    const query = readScript('usuario/insert_usuario.sql');
+    const values = [usuario.nmUsuario];
 
-  return await pool.query(query, values).then(res => {
-    pool.end();
-    return res.rows.map(data => convertDataToModel(data, new Usuario()))[0];
+    pool
+      .query(query, values)
+      .then(res => {
+        pool.end();
+        return res.rows.map(data => convertDataToModel(data, new Usuario()))[0];
+      })
+      .then(resolve)
+      .catch(reject);
   });
 
   /**
@@ -105,17 +129,24 @@ async function insertUsuario(usuario) {
  * @returns {Promise<Usuario>} Promise com o Usuário deletado
  */
 async function deleteUsuarioById(id) {
-  let usuarioToReturn;
-  await selectUsuarioById(id).then(usuario => (usuarioToReturn = usuario));
+  return new Promise(async (resolve, reject) => {
+    let usuarioToReturn;
+    await selectUsuarioById(id)
+      .then(usuario => (usuarioToReturn = usuario))
+      .catch(reject);
 
-  const pool = new Pool(config);
+    const pool = new Pool(config);
 
-  const query = readScript('usuario/delete_usuario_byid.sql');
-  const values = [id];
+    const query = readScript('usuario/delete_usuario_byid.sql');
+    const values = [id];
 
-  return await pool.query(query, values).then(res => {
-    pool.end();
-    return usuarioToReturn;
+    pool
+      .query(query, values)
+      .then(res => {
+        pool.end();
+        resolve(usuarioToReturn);
+      })
+      .catch(reject);
   });
 }
 
