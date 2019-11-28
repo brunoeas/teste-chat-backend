@@ -1,4 +1,4 @@
-const { NEW_MESSAGE } = require('./events');
+const { NEW_MESSAGE, ERROR } = require('./events');
 const { insertMensagem } = require('../dao/mensagemDAO');
 
 /**
@@ -9,10 +9,8 @@ const { insertMensagem } = require('../dao/mensagemDAO');
 function mensagemService(socket) {
   socket.on(NEW_MESSAGE, data =>
     insertMensagem(data)
-      .then(mensagem => socket.emit(NEW_MESSAGE, mensagem))
-      .catch(err => {
-        throw err;
-      })
+      .then(mensagem => socket.server.emit(NEW_MESSAGE, mensagem))
+      .catch(err => socket.emit(ERROR, err))
   );
 }
 

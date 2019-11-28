@@ -7,7 +7,8 @@ const events = {
   USER_LOGGED_OFF: 'userLoggedOff',
   USER_IS_TYPING: 'userIsTyping',
   NEW_MESSAGE: 'newMessage',
-  ERROR: 'Error'
+  ERROR: 'Error',
+  RESPONSE: 'Response'
 };
 
 module.exports = events;

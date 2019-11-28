@@ -56,7 +56,7 @@ function readScript(fileName) {
 }
 
 /**
- * Converte uma data para string e formata ela
+ * Converte uma data para string e formata ela para o padrão YYYY-MM-DDTHH:mm:ssZZ
  *
  * @author Bruno Eduardo
  * @param {String} date - Data que vai ser convertida e formatada
