@@ -2,7 +2,8 @@
 
 CREATE TABLE IF NOT EXISTS usuario (
   id_usuario serial PRIMARY KEY,
-  nm_usuario VARCHAR(100) NOT NULL
+  nm_usuario VARCHAR(100) NOT NULL,
+  dh_criacao TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS mensagem (

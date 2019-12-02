@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const config = require('../../config-db.json');
 const { convertDataToModel, readScript } = require('./utils');
 const Usuario = require('../model/usuario');
+const moment = require('moment');
 
 /**
  * Retorna todos os Usuários
@@ -92,7 +93,7 @@ async function insertUsuario(usuario) {
     const pool = new Pool(config);
 
     const query = readScript('usuario/insert_usuario.sql');
-    const values = [usuario.nmUsuario];
+    const values = [usuario.nmUsuario, moment().format('YYYY-MM-DDTHH:mm:ssZZ')];
 
     pool
       .query(query, values)

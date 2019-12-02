@@ -1,7 +1,8 @@
 const { Pool } = require('pg');
 const config = require('../../config-db.json');
-const { convertDataToModel, readScript, convertAndFormatDate } = require('./utils');
+const { convertDataToModel, readScript } = require('./utils');
 const Mensagem = require('../model/mensagem');
+const moment = require('moment');
 
 /**
  * Insere uma nova mensagem no banco
@@ -14,12 +15,40 @@ async function insertMensagem(mensagem) {
   return new Promise((resolve, reject) => {
     const pool = new Pool(config);
 
-    const query = readScript('usuario/insert_usuario.sql');
+    const query = readScript('mensagem/insert_mensagem.sql');
     const values = [
       mensagem.usuario.idUsuario,
       mensagem.dsText,
-      convertAndFormatDate(mensagem.dhEnviado)
+      moment().format('YYYY-MM-DDTHH:mm:ssZZ')
     ];
+
+    pool
+      .query(query, values)
+      .then(res => {
+        pool.end();
+        return res.rows.map(data => {
+          const retorno = convertDataToModel(data, new Mensagem());
+          retorno.usuario = mensagem.usuario;
+          return retorno;
+        })[0];
+      })
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
+/**
+ * Retorna todas as Mensagens que foram enviadas depois da data passada como parâmetro
+ *
+ * @param {Date} date - Data hora para filtrar
+ * @returns {Promise<Mensagem[]>} Promise com as Mensagem filtradas
+ */
+async function selectMensagensAfterDate(date) {
+  return new Promise((resolve, reject) => {
+    const pool = new Pool(config);
+
+    const query = readScript('mensagem/select_mensagens_after_date.sql');
+    const values = [moment(date).format('YYYY-MM-DDTHH:mm:ssZZ')];
 
     pool
       .query(query, values)
@@ -28,8 +57,8 @@ async function insertMensagem(mensagem) {
         return res.rows.map(data => convertDataToModel(data, new Mensagem()))[0];
       })
       .then(resolve)
-      .then(reject);
+      .catch(reject);
   });
 }
 
-module.exports = { insertMensagem };
+module.exports = { insertMensagem, selectMensagensAfterDate };
