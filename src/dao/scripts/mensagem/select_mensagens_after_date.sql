@@ -1,0 +1,1 @@
+SELECT * FROM mensagem WHERE dh_enviado >= $1;

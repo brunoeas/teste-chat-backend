@@ -1,1 +1,1 @@
-INSERT INTO usuario (nm_usuario) VALUES ($1) RETURNING *;
+INSERT INTO usuario (nm_usuario, dh_criacao) VALUES ($1, $2) RETURNING *;

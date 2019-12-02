@@ -55,15 +55,4 @@ function readScript(fileName) {
   return fs.readFileSync(`${__dirname}/scripts/${fileName}`).toString();
 }
 
-/**
- * Converte uma data para string e formata ela para o padrão YYYY-MM-DDTHH:mm:ssZZ
- *
- * @author Bruno Eduardo
- * @param {String} date - Data que vai ser convertida e formatada
- * @returns {String} Data convertida e formatada
- */
-function convertAndFormatDate(date) {
-  return moment(date).format('YYYY-MM-DDTHH:mm:ssZZ');
-}
-
-module.exports = { convertDataToModel, readScript, convertAndFormatDate };
+module.exports = { convertDataToModel, readScript };
