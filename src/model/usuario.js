@@ -9,11 +9,13 @@ class Usuario {
    *
    * @param {Number} [idUsuario=undefined] - ID do Usuário
    * @param {String} [nmUsuario=undefined] - Nome do Usuário
+   * @param {Date} [dhCriacao=undefined] - Data hora de criação
    * @memberof Usuario
    */
-  constructor(idUsuario = undefined, nmUsuario = undefined) {
+  constructor(idUsuario = undefined, nmUsuario = undefined, dhCriacao = undefined) {
     this.idUsuario = idUsuario;
     this.nmUsuario = nmUsuario;
+    this.dhCriacao = dhCriacao;
   }
 }
 
