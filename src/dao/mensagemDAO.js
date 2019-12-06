@@ -3,7 +3,6 @@ const config = require('../../config-db.json');
 const { convertDataToModel, readScript } = require('./utils');
 const Mensagem = require('../model/mensagem');
 const moment = require('moment');
-const usuarioDAO = require('./usuarioDAO');
 
 /**
  * Insere uma nova mensagem no banco
@@ -53,26 +52,9 @@ async function selectMensagensAfterDate(date) {
 
     pool
       .query(query, values)
-      .then(async res => {
+      .then(res => {
         pool.end();
-
-        const retorno = [];
-
-        const promises = res.rows
-          .map(data => convertDataToModel(data, new Mensagem()))
-          .map(
-            async data =>
-              await usuarioDAO.selectUsuarioById(data.idUsuario).then(usuario => {
-                data.usuario = usuario;
-                retorno.push(data);
-              })
-          );
-
-        await Promise.all(promises);
-
-        retorno.sort((a, b) => new Date(a.dhEnviado) - new Date(b.dhEnviado));
-
-        return retorno;
+        return res.rows.map(data => convertDataToModel(data, new Mensagem()));
       })
       .then(resolve)
       .catch(reject);
