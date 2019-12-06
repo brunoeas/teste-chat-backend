@@ -6,7 +6,7 @@ const fs = require('fs');
  * @author Bruno Eduardo
  * @param {Object} data - Objeto que representa uma linha do banco de dados
  * @param {Object} model - Model para qual vai ser convertido
- * @returns Um objeto populado equivalente ao model passado
+ * @returns {@param model} Um objeto populado equivalente ao model passado
  */
 function convertDataToModel(data, model) {
   if (!data) return null;

@@ -4,12 +4,13 @@ const mensagemService = require('./mensagemService');
 /**
  * Inicia os services
  *
+ * @param {core.Express} app - Server HTTP
  * @param {SocketIO.Server} io - IO do Socket.io
  */
-function initServices(io) {
+function initServices(app, io) {
   io.on('connection', socket => {
-    usuarioService(socket);
-    mensagemService(socket);
+    usuarioService(app, socket);
+    mensagemService(app, socket);
   });
 }
 

@@ -54,7 +54,7 @@ async function selectMensagensAfterDate(date) {
       .query(query, values)
       .then(res => {
         pool.end();
-        return res.rows.map(data => convertDataToModel(data, new Mensagem()))[0];
+        return res.rows.map(data => convertDataToModel(data, new Mensagem()));
       })
       .then(resolve)
       .catch(reject);
