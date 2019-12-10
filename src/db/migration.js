@@ -21,7 +21,7 @@ async function migrateDatabase() {
         .catch(err => console.error('> Erro ao tentar fazer migration: \n', err))
         .then(() => console.log('> Migration finalizada'));
     })
-    .catch(console.error);
+    .catch(err => console.error('> Erro ao ler scripts: \n', err));
 }
 
 /**
