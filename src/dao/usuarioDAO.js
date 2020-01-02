@@ -1,161 +1,133 @@
-const { Pool } = require('pg');
-const config = require('../../config-db.json');
 const { convertDataToModel, readScript } = require('./utils');
 const Usuario = require('../model/usuario');
 const moment = require('moment');
 const { NOME_DUPLICADO } = require('./exceptions');
+const DAO = require('./dao');
 
 /**
- * Retorna todos os Usuários
+ * DAO do Usuário
  *
- * @author Bruno Eduardo
- * @returns {Promise<Usuario[]>} Promise com um array com todos os Usuários
+ * @author Bruno Eduardo <bruno.soares@kepha.com.br>
+ * @class UsuarioDAO
+ * @extends {DAO} - Classe DAO
  */
-async function selectAllUsuarios() {
-  return new Promise((resolve, reject) => {
-    const pool = new Pool(config);
+class UsuarioDAO extends DAO {
+  /**
+   * Retorna todos os Usuários
+   *
+   * @returns {Promise<Usuario[]>} Promise com um array com todos os Usuários
+   */
+  async selectAllUsuarios() {
+    return new Promise((resolve, reject) => {
+      const query = readScript('usuario/select_all_usuarios.sql');
 
-    const query = readScript('usuario/select_all_usuarios.sql');
-
-    pool
-      .query(query)
-      .then(res => {
-        pool.end();
-        return res.rows.map(data => convertDataToModel(data, new Usuario()));
-      })
-      .then(resolve)
-      .catch(reject);
-  });
-}
-
-/**
- * Retorna um Usuário pelo ID
- *
- * @author Bruno Eduardo
- * @param {Number} id - ID do Usuário
- * @returns {Promise<Usuario>} Promise com o Usuário
- */
-async function selectUsuarioById(id) {
-  return new Promise((resolve, reject) => {
-    const pool = new Pool(config);
-
-    const query = readScript('usuario/select_usuario_byid.sql');
-    const values = [id];
-
-    pool
-      .query(query, values)
-      .then(res => {
-        pool.end();
-        return res.rows.map(data => convertDataToModel(data, new Usuario()))[0];
-      })
-      .then(resolve)
-      .catch(reject);
-  });
-}
-
-/**
- * Retorna uma lista de Usuários pelo nome
- *
- * @author Bruno Eduardo
- * @param {String} nome - Nome para filtrar
- * @returns {Promise<Usuario[]>} Promise com a lista de Usuários
- */
-async function selectUsuarioByNome(nome) {
-  return new Promise((resolve, reject) => {
-    const pool = new Pool(config);
-
-    const query = readScript('usuario/select_usuario_bynome.sql');
-    const values = [nome];
-
-    pool
-      .query(query, values)
-      .then(res => {
-        pool.end();
-        return res.rows.map(data => convertDataToModel(data, new Usuario()));
-      })
-      .then(resolve)
-      .catch(reject);
-  });
-}
-
-/**
- * Insere um novo Usuário no banco
- *
- * @author Bruno Eduardo
- * @param {Usuario} usuario - Usuário que vai ser inserido
- * @returns {Promise<Usuario>} Uma Promise com o Usuário inserido e seus dados novos
- * @throws NOME_DUPLICADO - caso o nome do usuário ja esteja cadastrado;
- */
-async function insertUsuario(usuario) {
-  return new Promise(async (resolve, reject) => {
-    const isDuplicado = await isUsuarioNomeDuplicado(usuario.nmUsuario);
-    if (isDuplicado) reject(NOME_DUPLICADO);
-
-    const pool = new Pool(config);
-
-    const query = readScript('usuario/insert_usuario.sql');
-    const values = [usuario.nmUsuario, moment().format('YYYY-MM-DDTHH:mm:ssZZ')];
-
-    pool
-      .query(query, values)
-      .then(res => {
-        pool.end();
-        return res.rows.map(data => convertDataToModel(data, new Usuario()))[0];
-      })
-      .then(resolve)
-      .catch(reject);
-  });
+      this.pool
+        .query(query)
+        .then(res => res.rows.map(data => convertDataToModel(data, new Usuario())))
+        .then(resolve)
+        .catch(reject);
+    });
+  }
 
   /**
-   * Valida se o nome já existe na base de dados
+   * Retorna um Usuário pelo ID
    *
-   * @param {String} nome - Nome que vai ser validado
-   * @returns {Boolean} false = o nome não é duplicado; true = o nome é duplicado;
+   * @param {Number} id - ID do Usuário
+   * @returns {Promise<Usuario>} Promise com o Usuário
    */
-  async function isUsuarioNomeDuplicado(nome) {
-    let isNomeDuplicado = false;
+  async selectUsuarioById(id) {
+    return new Promise((resolve, reject) => {
+      const query = readScript('usuario/select_usuario_byid.sql');
+      const values = [id];
 
-    await selectUsuarioByNome(nome).then(usuarios => {
-      if (usuarios.length > 0) isNomeDuplicado = true;
+      this.pool
+        .query(query, values)
+        .then(res => res.rows.map(data => convertDataToModel(data, new Usuario()))[0])
+        .then(resolve)
+        .catch(reject);
     });
+  }
 
-    return isNomeDuplicado;
+  /**
+   * Retorna uma lista de Usuários pelo nome
+   *
+   * @param {String} nome - Nome para filtrar
+   * @returns {Promise<Usuario[]>} Promise com a lista de Usuários
+   */
+  async selectUsuarioByNome(nome) {
+    return new Promise((resolve, reject) => {
+      const query = readScript('usuario/select_usuario_bynome.sql');
+      const values = [nome];
+
+      this.pool
+        .query(query, values)
+        .then(res => res.rows.map(data => convertDataToModel(data, new Usuario())))
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  /**
+   * Insere um novo Usuário no banco
+   *
+   * @param {Usuario} usuario - Usuário que vai ser inserido
+   * @returns {Promise<Usuario>} Uma Promise com o Usuário inserido e seus dados novos
+   * @throws NOME_DUPLICADO - caso o nome do usuário ja esteja cadastrado;
+   */
+  async insertUsuario(usuario) {
+    /**
+     * Valida se o nome já existe na base de dados
+     *
+     * @param {String} nome - Nome que vai ser validado
+     * @returns {Boolean} false = o nome não é duplicado; true = o nome é duplicado;
+     */
+    const isUsuarioNomeDuplicado = async nome => {
+      let isNomeDuplicado = false;
+
+      await this.selectUsuarioByNome(nome).then(usuarios => {
+        if (usuarios.length > 0) isNomeDuplicado = true;
+      });
+
+      return isNomeDuplicado;
+    };
+
+    return new Promise(async (resolve, reject) => {
+      const isDuplicado = await isUsuarioNomeDuplicado(usuario.nmUsuario);
+      if (isDuplicado) reject(NOME_DUPLICADO);
+
+      const query = readScript('usuario/insert_usuario.sql');
+      const values = [usuario.nmUsuario, moment().format('YYYY-MM-DDTHH:mm:ssZZ')];
+
+      this.pool
+        .query(query, values)
+        .then(res => res.rows.map(data => convertDataToModel(data, new Usuario()))[0])
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  /**
+   * Deleta um Usuário pelo ID
+   *
+   * @param {Number} id - ID do Usuário
+   * @returns {Promise<Usuario>} Promise com o Usuário deletado
+   */
+  async deleteUsuarioById(id) {
+    return new Promise(async (resolve, reject) => {
+      let usuarioToReturn;
+      await this.selectUsuarioById(id)
+        .then(usuario => (usuarioToReturn = usuario))
+        .catch(reject);
+
+      const query = readScript('usuario/delete_usuario_byid.sql');
+      const values = [id];
+
+      this.pool
+        .query(query, values)
+        .then(res => resolve(usuarioToReturn))
+        .catch(reject);
+    });
   }
 }
 
-/**
- * Deleta um Usuário pelo ID
- *
- * @author Bruno Eduardo
- * @param {Number} id - ID do Usuário
- * @returns {Promise<Usuario>} Promise com o Usuário deletado
- */
-async function deleteUsuarioById(id) {
-  return new Promise(async (resolve, reject) => {
-    let usuarioToReturn;
-    await selectUsuarioById(id)
-      .then(usuario => (usuarioToReturn = usuario))
-      .catch(reject);
-
-    const pool = new Pool(config);
-
-    const query = readScript('usuario/delete_usuario_byid.sql');
-    const values = [id];
-
-    pool
-      .query(query, values)
-      .then(res => {
-        pool.end();
-        resolve(usuarioToReturn);
-      })
-      .catch(reject);
-  });
-}
-
-module.exports = {
-  selectAllUsuarios,
-  insertUsuario,
-  deleteUsuarioById,
-  selectUsuarioById,
-  selectUsuarioByNome
-};
+module.exports = UsuarioDAO;

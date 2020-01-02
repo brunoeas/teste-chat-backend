@@ -1,5 +1,5 @@
-const { insertMensagem, selectMensagensAfterDate } = require('../dao/mensagemDAO');
-const { selectUsuarioById } = require('../dao/usuarioDAO');
+const MensagemDAO = require('../dao/mensagemDAO');
+const UsuarioDAO = require('../dao/usuarioDAO');
 const { NEW_MESSAGE_RECEIVED } = require('./events');
 const { USUARIO_INEXISTENTE } = require('../dao/exceptions');
 
@@ -11,8 +11,12 @@ const { USUARIO_INEXISTENTE } = require('../dao/exceptions');
  * @param {SocketIO.Socket} socket - Socket
  */
 function mensagemService(app, socket) {
+  const mensagemDAO = new MensagemDAO();
+  const usuarioDAO = new UsuarioDAO();
+
   app.post('/message', (req, res) =>
-    insertMensagem(req.body)
+    mensagemDAO
+      .insertMensagem(req.body)
       .then(mensagem => {
         socket.broadcast.emit(NEW_MESSAGE_RECEIVED, mensagem);
         res.send(mensagem);
@@ -27,7 +31,7 @@ function mensagemService(app, socket) {
       '\n> tipo: ',
       typeof req.params.idUsuario
     );
-    selectUsuarioById(req.params.idUsuario).then(findMessages);
+    usuarioDAO.selectUsuarioById(req.params.idUsuario).then(findMessages);
 
     /**
      * Retorna as mensagens filtradas no response
@@ -38,13 +42,14 @@ function mensagemService(app, socket) {
       console.log('\n\n> Usuário que vai ser usado como filtro: ', user);
       if (!user) return res.status(400).send(USUARIO_INEXISTENTE);
 
-      return selectMensagensAfterDate(user.dhCriacao)
+      return mensagemDAO
+        .selectMensagensAfterDate(user.dhCriacao)
         .then(async messages => {
           const retorno = [];
 
           const promises = messages.map(
             async data =>
-              await selectUsuarioById(data.idUsuario).then(usuario => {
+              await usuarioDAO.selectUsuarioById(data.idUsuario).then(usuario => {
                 data.usuario = usuario;
                 retorno.push(data);
               })

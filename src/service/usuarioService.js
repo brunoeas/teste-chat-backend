@@ -1,4 +1,4 @@
-const { insertUsuario, deleteUsuarioById, selectUsuarioById } = require('../dao/usuarioDAO');
+const UsuarioDAO = require('../dao/usuarioDAO');
 const { USER_IS_TYPING, USER_LOGGED_OFF, NEW_USER } = require('./events');
 
 /**
@@ -9,8 +9,11 @@ const { USER_IS_TYPING, USER_LOGGED_OFF, NEW_USER } = require('./events');
  * @param {SocketIO.Socket} socket - Socket
  */
 function usuarioService(app, socket) {
+  const usuarioDAO = new UsuarioDAO();
+
   app.post('/login', (req, res) =>
-    insertUsuario(req.body)
+    usuarioDAO
+      .insertUsuario(req.body)
       .then(usuario => {
         socket.broadcast.emit(NEW_USER, usuario);
         res.send(usuario);
@@ -19,7 +22,8 @@ function usuarioService(app, socket) {
   );
 
   app.delete('/logoff/:id', (req, res) =>
-    deleteUsuarioById(req.params.id)
+    usuarioDAO
+      .deleteUsuarioById(req.params.id)
       .then(userDeleted => {
         socket.broadcast.emit(USER_LOGGED_OFF, userDeleted);
         res.send();
@@ -28,7 +32,8 @@ function usuarioService(app, socket) {
   );
 
   app.get('/usuario/:id', (req, res) =>
-    selectUsuarioById(req.params.id)
+    usuarioDAO
+      .selectUsuarioById(req.params.id)
       .then(usuario => res.send(usuario))
       .catch(err => res.status(400).send(err))
   );
