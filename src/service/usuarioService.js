@@ -4,6 +4,7 @@ const { USER_IS_TYPING, USER_LOGGED_OFF, NEW_USER } = require('./events');
 /**
  * Service do Usuário
  *
+ * @author Bruno Eduardo <bruno.soares@kepha.com.br>
  * @param {core.Express} app - Server HTTP
  * @param {SocketIO.Socket} socket - Socket
  */

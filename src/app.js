@@ -6,6 +6,11 @@ const http = require('http');
 const migrateDatabase = require('./db/migration');
 const initServices = require('./service/index');
 
+/**
+ * Função principal que inicia os serviços
+ *
+ * @author Bruno Eduardo <bruno.soares@kepha.com.br>
+ */
 async function app() {
   await migrateDatabase();
 
@@ -24,7 +29,7 @@ async function app() {
   const io = socketIO(server);
 
   const port = process.env.PORT || 2210;
-  await server.listen(port, () => console.log('> Servidor on-line na porta:', port));
+  server.listen(port, () => console.log('> Servidor on-line na porta:', port));
 
   initServices(app, io);
 }
