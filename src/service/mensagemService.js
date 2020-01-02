@@ -21,17 +21,14 @@ function mensagemService(app, socket) {
         socket.broadcast.emit(NEW_MESSAGE_RECEIVED, mensagem);
         res.send(mensagem);
       })
-      .catch(err => res.status(400).send(err))
+      .catch(res.status(400).send)
   );
 
   app.get('/message/after-user-creation/:idUsuario', (req, res) => {
-    console.log(
-      '\n\n> ID usuario para filtrar msgs: ',
-      req.params.idUsuario,
-      '\n> tipo: ',
-      typeof req.params.idUsuario
-    );
-    usuarioDAO.selectUsuarioById(req.params.idUsuario).then(findMessages);
+    usuarioDAO
+      .selectUsuarioById(req.params.idUsuario)
+      .then(findMessages)
+      .catch(res.status(400).send);
 
     /**
      * Retorna as mensagens filtradas no response
@@ -39,7 +36,6 @@ function mensagemService(app, socket) {
      * @param {Usuario} user - Usuário para filtrar
      */
     function findMessages(user) {
-      console.log('\n\n> Usuário que vai ser usado como filtro: ', user);
       if (!user) return res.status(400).send(USUARIO_INEXISTENTE);
 
       return mensagemDAO
@@ -60,14 +56,8 @@ function mensagemService(app, socket) {
           return retorno;
         })
         .then(messages => messages.sort((a, b) => new Date(a.dhEnviado) - new Date(b.dhEnviado)))
-        .then(mensagens => {
-          console.log('\n\n> Msgs: ', mensagens);
-          res.send(mensagens);
-        })
-        .catch(err => {
-          console.log('\n\n> Erro ao retornar msgs: ', err);
-          res.status(400).send(err);
-        });
+        .then(res.send)
+        .catch(res.status(400).send);
     }
   });
 }

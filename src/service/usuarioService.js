@@ -18,7 +18,7 @@ function usuarioService(app, socket) {
         socket.broadcast.emit(NEW_USER, usuario);
         res.send(usuario);
       })
-      .catch(err => res.status(400).send(err))
+      .catch(res.status(400).send)
   );
 
   app.delete('/logoff/:id', (req, res) =>
@@ -28,14 +28,14 @@ function usuarioService(app, socket) {
         socket.broadcast.emit(USER_LOGGED_OFF, userDeleted);
         res.send();
       })
-      .catch(err => res.status(400).send(err))
+      .catch(res.status(400).send)
   );
 
   app.get('/usuario/:id', (req, res) =>
     usuarioDAO
       .selectUsuarioById(req.params.id)
-      .then(usuario => res.send(usuario))
-      .catch(err => res.status(400).send(err))
+      .then(res.send)
+      .catch(res.status(400).send)
   );
 
   socket.on(USER_IS_TYPING, user => socket.server.emit(USER_IS_TYPING, user));
