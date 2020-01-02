@@ -3,6 +3,7 @@ const config = require('../../config-db.json');
 const { convertDataToModel, readScript } = require('./utils');
 const Usuario = require('../model/usuario');
 const moment = require('moment');
+const { NOME_DUPLICADO } = require('./exceptions');
 
 /**
  * Retorna todos os Usuários
@@ -88,7 +89,7 @@ async function selectUsuarioByNome(nome) {
 async function insertUsuario(usuario) {
   return new Promise(async (resolve, reject) => {
     const isDuplicado = await isUsuarioNomeDuplicado(usuario.nmUsuario);
-    if (isDuplicado) reject('NOME_DUPLICADO');
+    if (isDuplicado) reject(NOME_DUPLICADO);
 
     const pool = new Pool(config);
 
