@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const config = require('../../config-db.json');
 
 /**
  * Classe DAO
