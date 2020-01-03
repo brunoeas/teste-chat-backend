@@ -21,14 +21,14 @@ function mensagemService(app, socket) {
         socket.broadcast.emit(NEW_MESSAGE_RECEIVED, mensagem);
         res.send(mensagem);
       })
-      .catch(res.status(400).send)
+      .catch(err => res.status(400).send(err))
   );
 
   app.get('/message/after-user-creation/:idUsuario', (req, res) => {
     usuarioDAO
       .selectUsuarioById(req.params.idUsuario)
       .then(findMessages)
-      .catch(res.status(400).send);
+      .catch(err => res.status(400).send(err));
 
     /**
      * Retorna as mensagens filtradas no response
@@ -56,8 +56,8 @@ function mensagemService(app, socket) {
           return retorno;
         })
         .then(messages => messages.sort((a, b) => new Date(a.dhEnviado) - new Date(b.dhEnviado)))
-        .then(res.send)
-        .catch(res.status(400).send);
+        .then(messages => res.send(messages))
+        .catch(err => res.status(400).send(err));
     }
   });
 }
