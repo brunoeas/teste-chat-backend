@@ -1,5 +1,5 @@
 const UsuarioDAO = require('../dao/usuarioDAO');
-const { USER_IS_TYPING, USER_LOGGED_OFF, NEW_USER } = require('./events');
+const { USER_LOGGED_OFF, NEW_USER } = require('./events');
 
 /**
  * Service do Usuário
@@ -37,8 +37,6 @@ function usuarioService(app, socket) {
       .then(user => res.send(user))
       .catch(err => res.status(400).send(err))
   );
-
-  socket.on(USER_IS_TYPING, user => socket.server.emit(USER_IS_TYPING, user));
 }
 
 module.exports = usuarioService;
